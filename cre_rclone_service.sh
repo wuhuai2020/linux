@@ -187,7 +187,7 @@ do
 done
 
 
-
+fusermount -qzu "${path}"
 if [[ ! -d ${path} ]];then
 	echo "${path} 不存在，正在创建..."
 	mkdir -p ${path}
