@@ -6,7 +6,7 @@ i=1
 release=""
 sys=""
 
-ip_addr=$(curl ifconfig.me)
+ip_addr=$(curl -s ifconfig.me)
 nfo_db_path="/home/Emby"
 db_path="/mnt/video/EmbyDatabase/"
 nfo_db_file="Emby削刮库.tar.gz"
@@ -94,7 +94,13 @@ fi
 #
 #安装Emby服务
 #
-
+#emby_version="4.5.0.50"
+emby_version=`curl -s https://github.com/MediaBrowser/Emby.Releases/releases/ | grep -Eo "tag/[0-9.]+\">([0-9.]+.*)" | grep -v "beta"|grep -Eo "[0-9.]+"|uniq`
+centos_packet_file="emby-server-rpm_${emby_version}_x86_64.rpm"
+debian_packet_file="emby-server-deb_${emby_version}_amd64.deb"
+url="https://github.com/MediaBrowser/Emby.Releases/releases/download"
+debian_url="${url}/${emby_version}/${debian_packet_file}"
+centos_url="${url}/${emby_version}/${centos_packet_file}"
 
 	
 setup(){
@@ -108,15 +114,15 @@ setup(){
 	echo -e "您的系统是${release}。正在为您准备安装包,请稍等..."
 	if [[ "${release}" = "debian" ]];then
 		if [[ "${sys}" = "x86_64" ]];then
-			wget -c https://github.com/MediaBrowser/Emby.Releases/releases/download/4.5.0.50/emby-server-deb_4.5.0.50_amd64.deb && dpkg -i emby-server-deb_4.5.0.50_amd64.deb
+			wget -c "${debian_url}" && dpkg -i "${debian_packet_file}"
 		fi
 	elif [[ "${release}" = "ubuntu" ]];then
 		if [[ "${sys}" = "x86_64" ]];then
-			wget -c https://github.com/MediaBrowser/Emby.Releases/releases/download/4.5.0.50/emby-server-deb_4.5.0.50_amd64.deb && dpkg -i emby-server-deb_4.5.0.50_amd64.deb
+			wget -c "${debian_url}" && dpkg -i "${debian_packet_file}"
 		fi
 	elif [[ "${release}" = "centos" ]];then
 		if [[ "${sys}" = "x86_64" ]];then
-			yum install -y https://github.com/MediaBrowser/Emby.Releases/releases/download/4.5.0.50/emby-server-rpm_4.5.0.50_x86_64.rpm
+			yum install -y "${centos_url}"
 		fi
 	fi
 
