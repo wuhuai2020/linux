@@ -259,6 +259,29 @@ fi
 #
 #复制Emby配置文件
 #
+select_copy_config(){
+	echo
+	echo -e "下面即将复制Emby削刮包及配置文件，需要大概1小时时间，确定是否愿意."
+	read -n1 -p "Y继续复制削刮包及配置文件，n退出脚本不复制削刮包及配置文件[Y/n]" select
+
+	case ${select} in
+		Y|y)
+			echo
+			echo ”继续执行复制削刮包.请耐心等待...“;;
+		N|n)
+			echo
+			echo "您选择了退出复制削刮包及配置文件."
+			exit 1;;
+		*)
+			echo
+			echo "选择错误.请重新选择。"
+			select_copy_config;;
+	esac
+
+
+
+}
+select_copy_config
 
 if [ -f /usr/lib/systemd/system/emby-server.service ];then
 	echo "停用Emby服务..."
