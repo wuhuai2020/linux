@@ -6,7 +6,6 @@ i=1
 release=""
 sys=""
 
-ip_addr=$(curl -s ifconfig.me)
 nfo_db_path="/home/Emby"
 db_path="/mnt/video/EmbyDatabase/"
 nfo_db_file="Emby削刮库.tar.gz"
@@ -58,6 +57,7 @@ check_command(){
 check_command wget
 check_command curl
 
+ip_addr=$(curl -s ifconfig.me)
 
 
 #
