@@ -39,7 +39,7 @@ check_command(){
 		elif [[ "${release}" = "debian" || "${release}" = "ubuntu" ]];then
 			apt-get install $1 -y
 		else
-			echo "对不起！您的系统暂不支持该脚本，请联系作者做定制优化，谢谢！"
+			echo -e "${RED}对不起！您的系统暂不支持该脚本，请联系作者做定制优化，谢谢！${END}"
 			exit 1
 		fi
 	fi
@@ -57,15 +57,15 @@ check_dir_file(){
 
 check_rclone(){
 	check_dir_file "/usr/bin/rclone"
-	[ "$?" -ne 0 ] && echo -e "未检测到rclone程序.请重新运行脚本安装rclone." && exit 1
+	[ "$?" -ne 0 ] && echo -e "${RED}未检测到rclone程序.请重新运行脚本安装rclone.${END}" && exit 1
 	check_dir_file "/root/.config/rclone/rclone.conf"
-	[ "$?" -ne 0 ] && echo -e "未检测到rclone配置文件.请重新运行脚本安装rclone." && exit 1
+	[ "$?" -ne 0 ] && echo -e "${RED}未检测到rclone配置文件.请重新运行脚本安装rclone.${END}" && exit 1
 	return 0 
 }
 
 check_emby(){
 	check_dir_file "/usr/lib/systemd/system/emby-server.service"
-	[ "$?" -ne 0 ] && echo -e "未检测到Emby程序.请重新运行脚本安装Emby." && exit 1
+	[ "$?" -ne 0 ] && echo -e "${RED}未检测到Emby程序.请重新运行脚本安装Emby.${END}" && exit 1
 	return 0
 }
 
@@ -210,7 +210,7 @@ create_rclone_service(){
 
 	fusermount -qzu "${path}"
 	if [[ ! -d ${path} ]];then
-		echo "${path} 不存在，正在创建..."
+		echo -e " ${RED}${path}${END} 不存在，正在创建..."
 		mkdir -p ${path}
 		sleep 1s
 		echo "创建完成！"
@@ -301,13 +301,13 @@ copy_emby_config(){
 		mv /var/lib/emby /var/lib/emby.bak
 		mv /opt/emby-server /opt/emby-server.bak
 		sleep 2s
-		echo -e "已将/var/lib/emby和/opt/emby-server分别备份到当前目录."
+		echo -e "已将 ${RED}/var/lib/emby${END} 和 ${RED}/opt/emby-server${END} 分别备份到当前目录."
 		echo
 	elif  [ -d /var/lib/emby.bak ] && [ -d /opt/emby-server.bak ];then
 		echo -e "已备份，无需备份."
 		sleep 2s
 	fi
-	echo -e "正在安装削刮库到/home/Emby需要很长时间,请耐心等待..."
+	echo -e "正在安装削刮库到 ${RED}${nfo_db_path}${END} 需要很长时间,请耐心等待..."
 	if [ ! -d "${nfo_db_path}" ];then
 		mkdir ${nfo_db_path}
 	fi
@@ -315,7 +315,7 @@ copy_emby_config(){
 		if [ -f "${db_path}${nfo_db_file}" ];then
 			tar -xzf ${db_path}${nfo_db_file} -C ${nfo_db_path}
 		else
-			echo -e "未能找到削刮包 ${db_path}${nfo_db_file} 请确认无误后重新运行脚本."
+			echo -e "未能找到削刮包 ${RED}${db_path}${nfo_db_file}${END} 请确认无误后重新运行脚本."
 			exit 1
 		fi
 		echo -e "Emby削刮包安装完成."
@@ -326,7 +326,7 @@ copy_emby_config(){
 		if [ -f ${db_path}${opt_file} ];then
 			tar -xzf ${db_path}${opt_file} -C /opt
 		else
-			echo -e "未能找到削刮包 ${db_path}${opt_file} 请确认无误后重新运行脚本."
+			echo -e "未能找到削刮包 ${RED}${db_path}${opt_file}${END} 请确认无误后重新运行脚本."
 			exit 1
 
 		fi
@@ -334,7 +334,7 @@ copy_emby_config(){
 		if [ -f ${db_path}${var_config_file} ];then
 			tar -xzf ${db_path}${var_config_file} -C /var/lib
 		else
-			echo -e "未能找到削刮包 ${db_path}${var_config_file} 请确认无误后重新运行脚本."
+			echo -e "未能找到削刮包 ${RED}${db_path}${var_config_file}${END} 请确认无误后重新运行脚本."
 			exit 1
 
 		fi
@@ -342,7 +342,7 @@ copy_emby_config(){
 		echo
 
 	else
-		echo "未找到${db_path},请检查是否正确挂载。确认无误后重新执行脚本."
+		echo -e "未找到 ${RED}${db_path}${END},请检查是否正确挂载。确认无误后重新执行脚本."
 		exit 1
 
 	fi
@@ -392,7 +392,7 @@ menu(){
 			exit 1;;
 		*)
 			echo
-			echo -e "选择错误，请重新选择。"
+			echo -e "${RED}选择错误，请重新选择。${END}"
 			menu;;
 	esac
 
