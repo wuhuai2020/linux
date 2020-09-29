@@ -383,8 +383,22 @@ copy_emby_config(){
 	echo
 	echo -e "访问地址为:${RED}http://${ip_addr}:8096。账号：admin 密码为空${END}"
 }
-
+menu_go_on(){
+	echo
+	read -n1 -p "是否继续执行脚本 (Y继续执行，N退出脚本)[Y/n]" res
+	echo
+	case "$res" in
+		Y |y)
+			;;
+		N | n)
+			exit 1;;
+		*)
+			echo "输入错误"
+			menu_go_on;;
+	esac
+}
 menu(){
+	clear
 	echo
 	echo
 	echo -e "   ${RED}+-----------------------------------------------+${END}"
@@ -407,7 +421,7 @@ menu(){
 	check_command wget
 	
 	ip_addr=$(curl -s ifconfig.me)
-	case ${select_menu} in
+	case "${select_menu}" in
 		1)
 			setup_rclone;;
 		2)
@@ -423,7 +437,8 @@ menu(){
 			echo -e "${RED}选择错误，请重新选择。${END}"
 			menu;;
 	esac
-
+	menu_go_on
+	menu
 }
 
 menu
