@@ -6,7 +6,7 @@ i=1
 release=""
 sys=""
 ip_addr=""
-
+emby_local_version=""
 #
 #检查系统相关
 #
@@ -69,7 +69,15 @@ check_emby(){
 	return 0
 }
 
-
+check_emby_local_version(){
+	if [[ "${release}" == "centos" ]];then
+		emby_local_version=$(yum list emby-server | grep -Eo "[0-9.]+\.[0-9]+"|uniq)
+	elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]];then
+		emby_local_version=$(apt list emby-server | grep -Eo "[0-9.]+\.[0-9]+")
+	else
+		echo "${RED}获取emby版本失败.暂时不支持您的操作系统.${END}"
+	fi
+}
 
 
 #
@@ -123,11 +131,19 @@ setup_emby(){
 	debian_url="${url}/${emby_version}/${debian_packet_file}"
 	centos_url="${url}/${emby_version}/${centos_packet_file}"
 	
+	check_emby_local_version
 
-	if [ -f /usr/lib/systemd/system/emby-server.service ]; then
-		sleep 1s
-		echo -e "提示：Emby已经存在.无须安装."
-		return 1
+	if [ -n "${emby_local_version}" ]; then
+	
+		if [ "${emby_local_version}" = "${emby_version}" ];then
+			sleep 1s
+			echo -e "本系统已安装最新版，无需操作。"
+			return 0
+		else
+			sleep 1s
+			echo -e "已安装版本为：${RED}${emby_local_version}${END}.最新版本为：${RED}${emby_version}${END}.正在为您更新..."
+			echo 	
+		fi
 	fi
 
 	echo -e "您的系统是 ${RED}${release}${END}。正在为您准备安装包,请稍等..."
@@ -410,7 +426,7 @@ menu(){
 	echo
 	echo -e "${RED}      主菜单：${END}"
 	echo -e "${RED}          【1】安装Rclone.${END}"
-	echo -e "${RED}          【2】安装Emby.${END}"
+	echo -e "${RED}          【2】安装/更新Emby.${END}"
 	echo -e "${RED}          【3】安装Rclone服务.${END}"
 	echo -e "${RED}          【4】复制Emby削刮包.${END}"
 	echo -e "${RED}          【5】退出脚本.${END}"
