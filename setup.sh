@@ -5,7 +5,7 @@ list=()
 i=1
 release=""
 sys=""
-
+ip_addr=""
 
 #
 #检查系统相关
@@ -124,11 +124,11 @@ setup_emby(){
 
 	if [ -f /usr/lib/systemd/system/emby-server.service ]; then
 		sleep 1s
-		echo -e "Emby已经存在.无须安装."
+		echo -e "提示：Emby已经存在.无须安装."
 		return 1
 	fi
 
-	echo -e "您的系统是${release}。正在为您准备安装包,请稍等..."
+	echo -e "您的系统是 ${RED}${release}${END}。正在为您准备安装包,请稍等..."
 	if [[ "${release}" = "debian" ]];then
 		if [[ "${sys}" = "x86_64" ]];then
 			wget -c "${debian_url}" && dpkg -i "${debian_packet_file}"
@@ -142,7 +142,7 @@ setup_emby(){
 			yum install -y "${centos_url}"
 		fi
 	fi
-
+	echo -e "Emby安装成功.您可以访问 ${RED}https://${ip_addr}:8096/${END} 进一步配置Emby."
 
 }	
 
@@ -281,7 +281,6 @@ copy_emby_config(){
 	opt_file="Emby-server数据库.tar.gz"
 	var_config_file="Emby-VarLibEmby数据库.tar.gz"
 	
-	ip_addr=$(curl -s ifconfig.me)
 	
 	
 	check_emby
@@ -379,6 +378,7 @@ menu(){
 	check_command curl
 	check_command wget
 	
+	ip_addr=$(curl -s ifconfig.me)
 	case ${select_menu} in
 		1)
 			setup_rclone;;
@@ -395,5 +395,7 @@ menu(){
 			echo -e "选择错误，请重新选择。"
 			menu;;
 	esac
+
 }
+
 menu
