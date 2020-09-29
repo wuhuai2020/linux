@@ -385,7 +385,8 @@ copy_emby_config(){
 }
 menu_go_on(){
 	echo
-	read -n1 -p "是否继续执行脚本 (Y继续执行，N退出脚本)[Y/n]" res
+	echo -e "${RED}是否继续执行脚本?${END}"
+	read -n1 -p "Y继续执行，N退出脚本[Y/n]" res
 	echo
 	case "$res" in
 		Y |y)
