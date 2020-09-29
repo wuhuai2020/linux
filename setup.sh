@@ -81,6 +81,8 @@ setup_rclone(){
 
 		echo -e "正在下载rclone,请稍等..."
 		wget https://raw.githubusercontent.com/wuhuai2020/linux/master/rclone.tar.gz && tar zxvf rclone.tar.gz -C /usr/bin/
+		sleep 1s
+		rm -f rclone.tar.gz
 	fi
 
 	if [[ -f /usr/bin/rclone ]];then
@@ -132,14 +134,20 @@ setup_emby(){
 	if [[ "${release}" = "debian" ]];then
 		if [[ "${sys}" = "x86_64" ]];then
 			wget -c "${debian_url}" && dpkg -i "${debian_packet_file}"
+			sleep 1s
+			rm -f "${debian_packet_file}"
 		fi
 	elif [[ "${release}" = "ubuntu" ]];then
 		if [[ "${sys}" = "x86_64" ]];then
 			wget -c "${debian_url}" && dpkg -i "${debian_packet_file}"
+			sleep 1s
+			rm -f "${debian_packet_file}"
 		fi
 	elif [[ "${release}" = "centos" ]];then
 		if [[ "${sys}" = "x86_64" ]];then
 			yum install -y "${centos_url}"
+			sleep 1s
+			rm -f "${centos_packet_file}"
 		fi
 	fi
 	echo -e "Emby安装成功.您可以访问 ${RED}https://${ip_addr}:8096/${END} 进一步配置Emby."
@@ -274,6 +282,18 @@ create_rclone_service(){
 #
 #复制Emby配置文件
 #
+renew_emby(){
+	if [ -d /var/lib/emby.bak ] && [ -d /opt/emby-server.bak ];then
+		 echo -e "找到已备份的emby配置文件，正在还原..."
+		 mv /var/lib/emby.bak /var/lib/emby
+		 mv /opt/emby-server.bak /opt/emby-server		
+		 systemctl start emby-server.service
+		 echo
+		 echo -e "已还原Emby."
+	 else
+		 echo -e "${RED}未知错误.还原失败!${END}"
+	fi
+}
 copy_emby_config(){
 	nfo_db_path="/home/Emby"
 	db_path="/mnt/video/EmbyDatabase/"
@@ -316,6 +336,8 @@ copy_emby_config(){
 			tar -xzf ${db_path}${nfo_db_file} -C ${nfo_db_path}
 		else
 			echo -e "未能找到削刮包 ${RED}${db_path}${nfo_db_file}${END} 请确认无误后重新运行脚本."
+			echo
+			renew_emby
 			exit 1
 		fi
 		echo -e "Emby削刮包安装完成."
@@ -327,6 +349,8 @@ copy_emby_config(){
 			tar -xzf ${db_path}${opt_file} -C /opt
 		else
 			echo -e "未能找到削刮包 ${RED}${db_path}${opt_file}${END} 请确认无误后重新运行脚本."
+			echo
+			renew_emby
 			exit 1
 
 		fi
@@ -335,6 +359,8 @@ copy_emby_config(){
 			tar -xzf ${db_path}${var_config_file} -C /var/lib
 		else
 			echo -e "未能找到削刮包 ${RED}${db_path}${var_config_file}${END} 请确认无误后重新运行脚本."
+			echo
+			renew_emby
 			exit 1
 
 		fi
@@ -343,6 +369,8 @@ copy_emby_config(){
 
 	else
 		echo -e "未找到 ${RED}${db_path}${END},请检查是否正确挂载。确认无误后重新执行脚本."
+		echo
+		renew_emby
 		exit 1
 
 	fi
