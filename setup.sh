@@ -218,27 +218,30 @@ create_rclone_service(){
                         echo
                         for((j=1;j<=${#list[@]};j++))
                         do
-                                echo -e "      ${RED}${j}：[${list[j]}]${END}"
-                                echo
+                                echo -e "      ${RED}${j}：${list[j]}${END}"
+                                echo -e "      `red ------------`"
                         done
 
 
                         echo
                         read -n3 -p "   请选择需要挂载的网盘（输入数字即可）：" rclone_config_name
                         if [ ${rclone_config_name} -le ${#list[@]} ] && [ -n ${rclone_config_name} ];then
+                                echo
                                 echo -e "`curr_date` 您选择了：${RED}${list[rclone_config_name]}${END}"
                                 break
                         fi
                         echo
-                        echo "  输入不正确，请重新输入。"
+                        echo "输入不正确，请重新输入。"
                         echo
                 done
-                read -p "  请输入需要挂载目录的路径（如不是绝对路径则挂载到/mnt下）:" path
+                echo
+                read -p "请输入需要挂载目录的路径（如不是绝对路径则挂载到/mnt下）:" path
                 if [[ "${path:0:1}" != "/" ]];then
                         path="/mnt/${path}"
                 fi
                 while [[ 0 ]]
                 do
+                        echo
                         echo -e "您选择了 ${RED}${list[rclone_config_name]}${END} 网盘，挂载路径为 ${RED}${path}${END}."
                         read -n1 -p "确认无误[Y/n]:" result
                         echo
@@ -259,17 +262,20 @@ create_rclone_service(){
 
         fusermount -qzu "${path}"
         if [[ ! -d ${path} ]];then
+                echo
                 echo -e "`curr_date`  ${RED}${path}${END} 不存在，正在创建..."
                 mkdir -p ${path}
                 sleep 1s
+                echo
                 echo -e "`curr_date` 创建完成！"
         fi
 
 
 
-
+        echo
         echo -e "`curr_date` 正在检查服务是否存在..."
         if [[ -f /lib/systemd/system/rclone-${list[rclone_config_name]}.service ]];then
+
                 echo -e "`curr_date` 找到服务 \"${RED}rclone-${list[rclone_config_name]}.service${END}\"正在删除，请稍等..."
                 systemctl stop rclone-${list[rclone_config_name]}.service &> /dev/null
                 systemctl disable rclone-${list[rclone_config_name]}.service &> /dev/null
@@ -304,6 +310,7 @@ create_rclone_service(){
         fi
 
         sleep 2s
+        echo
         echo -e "`curr_date` 启动服务..."
         systemctl start rclone-${list[rclone_config_name]}.service &> /dev/null
         sleep 1s
@@ -316,6 +323,7 @@ create_rclone_service(){
                 echo
                 sleep 2s
         else
+                echo
                 echo -e "`curr_date` 警告:未知错误."
         fi
 }
@@ -332,6 +340,7 @@ renew_emby(){
                  echo
                  echo -e "`curr_date` 已还原Emby."
          else
+                echo
                  echo -e "`curr_date` ${RED}未知错误.还原失败!${END}"
         fi
 }
@@ -350,14 +359,17 @@ copy_emby_config(){
                 echo -e "`curr_date` 停用Emby服务..."
                 systemctl stop emby-server.service
                 sleep 2s
+                echo
                 echo -e "`curr_date` 已停用Emby服务"
         else
                 sleep 2s
+                echo
                 echo -e "`curr_date` 未找到emby.请重新执行安装脚本安装."
                 exit 1
         fi
 
         if [ -d /var/lib/emby ] && [ -d /opt/emby-server ];then
+                echo
                 echo -e "`curr_date` 已找到emby配置文件，正在备份..."
                 mv -f /var/lib/emby /var/lib/emby.bak
                 mv -f /opt/emby-server /opt/emby-server.bak
