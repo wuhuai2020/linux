@@ -46,7 +46,7 @@ check_command(){
 untar(){
         total_size=`du -sk $1 | awk '{print $1}'`
         echo
-	pv -s $((${total_size} * 1020)) $1 | tar zxf - -C $2
+        pv -s $((${total_size} * 1020)) $1 | tar zxf - -C $2
 }
 
 
@@ -82,16 +82,16 @@ check_emby_local_version(){
                 echo -e "${RED}获取emby版本失败.暂时不支持您的操作系统.${END}"
         fi
 }
-red(){ 
-        echo -e "${RED}${1}${END}" 
-} 
- 
- 
- 
-curr_date(){ 
-        curr_date=`date +[%Y-%m-%d"_"%H:%M:%S]` 
-        echo -e "`red $(date +[%Y-%m-%d_%H:%M:%S])`" 
-} 
+red(){
+        echo -e "${RED}${1}${END}"
+}
+
+
+
+curr_date(){
+        curr_date=`date +[%Y-%m-%d"_"%H:%M:%S]`
+        echo -e "`red $(date +[%Y-%m-%d_%H:%M:%S])`"
+}
 #
 #安装rclone
 #
@@ -103,30 +103,39 @@ setup_rclone(){
                 wget https://raw.githubusercontent.com/wuhuai2020/linux/master/rclone.tar.gz && tar zxvf rclone.tar.gz -C /usr/bin/
                 sleep 1s
                 rm -f rclone.tar.gz
-        fi
 
-        if [[ -f /usr/bin/rclone ]];then
-                sleep 1s
-                echo
-                echo -e "`curr_date` Rclone安装成功."
+                if [[ -f /usr/bin/rclone ]];then
+                        sleep 1s
+                        echo
+                        echo -e "`curr_date` Rclone安装成功."
+                else
+                        echo -e "`curr_date` 安装失败.请重新运行脚本安装."
+                        exit 1
+                fi
+
         else
-                echo -e "`curr_date` 安装失败.请重新运行脚本安装."
-                exit 1
-        fi
+                echo
+                echo -e "`curr_date` 本机已安装rclone.无须安装."
+         fi
+
+
 
         if [[ ! -f /root/.config/rclone/rclone.conf ]];then
                 echo
                 echo -e "`curr_date` 正在下载rclone配置文件，请稍等..."
                 sleep 1s
                 wget https://raw.githubusercontent.com/wuhuai2020/linux/master/rclone.conf -P /root/.config/rclone/
-        fi
-        if [[ -f /root/.config/rclone/rclone.conf ]];then
-                sleep 1s
                 echo
-                echo -e "`curr_date` 配置文件下载成功."
+                if [[ -f /root/.config/rclone/rclone.conf ]];then
+                        sleep 1s
+                        echo -e "`curr_date` 配置文件下载成功."
+                else
+                        echo -e "`curr_date` 下载配置文件失败,请重新运行脚本下载."
+                        exit 1
+                fi
         else
-                echo -e "`curr_date` 下载配置文件失败,请重新运行脚本下载."
-                exit 1
+                echo
+                echo -e "`curr_date`   本机已存在配置文件.\n\n\t\t\t如需使用新的配置文件,请先手动删除本机配置文件(`red "mv -f /root/.config/rclone/rclone.conf /root/.config/rclone/"`)后再运行脚本."
         fi
 }
 
@@ -189,9 +198,9 @@ create_rclone_service(){
 
         check_rclone
 
-	i=1
+        i=1
 
-	list=()
+        list=()
 
         for item in $(sed -n "/\[.*\]/p" ~/.config/rclone/rclone.conf | grep -Eo "[0-9A-Za-z-]+")
         do
@@ -444,15 +453,22 @@ menu(){
         echo
         echo -e "   ${RED}+-----------------------------------------------+${END}"
         echo -e "   ${RED}|                                               |${END}"
+        echo -e "   ${RED}|                                               |${END}"
         echo -e "   ${RED}|      欢迎使用一键安装Rclone、Emby脚本         |${END}"
+        echo -e "   ${RED}|                                               |${END}"
         echo -e "   ${RED}|                                               |${END}"
         echo -e "   ${RED}+-----------------------------------------------+${END}"
         echo
         echo -e "${RED}      主菜单：${END}"
+        echo
         echo -e "${RED}          【1】安装Rclone.${END}"
+        echo
         echo -e "${RED}          【2】安装/更新Emby.${END}"
+        echo
         echo -e "${RED}          【3】安装Rclone服务.${END}"
+        echo
         echo -e "${RED}          【4】复制Emby削刮包.${END}"
+        echo
         echo -e "${RED}          【5】退出脚本.${END}"
         echo
         read  -p "请选择输入菜单对应数字开始执行：" select_menu
