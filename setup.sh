@@ -227,7 +227,7 @@ create_rclone_service(){
                 fi
                 while [[ 0 ]]
                 do
-                        echo -e "`curr_date` 您选择了 ${RED}${list[rclone_config_name]}${END} 网盘，挂载路径为 ${RED}${path}${END}."
+                        echo -e "您选择了 ${RED}${list[rclone_config_name]}${END} 网盘，挂载路径为 ${RED}${path}${END}."
                         read -n1 -p "确认无误[Y/n]:" result
                         echo
                         case ${result} in
@@ -256,7 +256,7 @@ create_rclone_service(){
 
 
 
-        echo "正在检查服务是否存在..."
+        echo -e "`curr_date` 正在检查服务是否存在..."
         if [[ -f /lib/systemd/system/rclone-${list[rclone_config_name]}.service ]];then
                 echo -e "`curr_date` 找到服务 \"${RED}rclone-${list[rclone_config_name]}.service${END}\"正在删除，请稍等..."
                 systemctl stop rclone-${list[rclone_config_name]}.service &> /dev/null
@@ -277,7 +277,7 @@ create_rclone_service(){
         [Install]
         WantedBy = multi-user.target" > /lib/systemd/system/rclone-${list[rclone_config_name]}.service
         sleep 2s
-        echo "服务创建成功。"
+        echo -e "`curr_date` 服务创建成功。"
         if [ ! -f /etc/fuse.conf ]; then
                 echo -e "`curr_date` 未找到fuse包.正在安装..."
                 sleep 1s
@@ -292,10 +292,10 @@ create_rclone_service(){
         fi
 
         sleep 2s
-        echo "启动服务..."
+        echo -e "`curr_date` 启动服务..."
         systemctl start rclone-${list[rclone_config_name]}.service &> /dev/null
         sleep 1s
-        echo "添加开机启动..."
+        echo -e "`curr_date` 添加开机启动..."
         systemctl enable rclone-${list[rclone_config_name]}.service &> /dev/null
         if [[ $? ]];then
                 echo
@@ -304,7 +304,7 @@ create_rclone_service(){
                 echo
                 sleep 2s
         else
-                echo "警告:未知错误."
+                echo -e "`curr_date` 警告:未知错误."
         fi
 }
 
@@ -335,7 +335,7 @@ copy_emby_config(){
         check_emby
 
         if [ -f /usr/lib/systemd/system/emby-server.service ];then
-                echo "`curr_date` 停用Emby服务..."
+                echo -e "`curr_date` 停用Emby服务..."
                 systemctl stop emby-server.service
                 sleep 2s
                 echo -e "`curr_date` 已停用Emby服务"
