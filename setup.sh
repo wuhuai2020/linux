@@ -46,7 +46,7 @@ check_command(){
 untar(){
         total_size=`du -sk $1 | awk '{print $1}'`
         echo
-	pv -s $((${total_size} * 1024)) $1 | tar zxf - -C $2
+	pv -s $((${total_size} * 1020)) $1 | tar zxf - -C $2
 }
 
 
