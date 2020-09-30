@@ -158,6 +158,7 @@ setup_emby(){
 
                 if [ "${emby_local_version}" = "${emby_version}" ];then
                         sleep 1s
+                        echo
                         echo -e "`curr_date` 本系统已安装最新版，无需操作。"
                         return 0
                 else
