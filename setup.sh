@@ -36,15 +36,20 @@ check_command(){
                 echo -e "${RED}$1${END} 不存在.正在为您安装，请稍后..."
                 if [[ "${release}" = "centos" ]];then
                         yum install $1 -y
-                elif [[ "${release}" = "debian" || "${release}" = "ubuntu" ]];th                                                                                                                                                             en
+                elif [[ "${release}" = "debian" || "${release}" = "ubuntu" ]];then
                         apt-get install $1 -y
                 else
-                        echo -e "${RED}对不起！您的系统暂不支持该脚本，请联系作                                                                                                                                                             者做定制优化，谢谢！${END}"
+                        echo -e "${RED}对不起！您的系统暂不支持该脚本，请联系作者做定制优化，谢谢！${END}"
                         exit 1
                 fi
         fi
 
 }
+untar(){
+        total_size=`du -sk $1 | awk '{print $1}'`
+        pv -s $((${total_size} * 1024)) $1 | tar zxf - -C $2
+}
+
 
 check_dir_file(){
         if [ "${1:0-1:1}" = "/" ] && [ -d "$1" ];then
@@ -57,23 +62,23 @@ check_dir_file(){
 
 check_rclone(){
         check_dir_file "/usr/bin/rclone"
-        [ "$?" -ne 0 ] && echo -e "${RED}未检测到rclone程序.请重新运行脚本安装rc                                                                                                                                                             lone.${END}" && exit 1
+        [ "$?" -ne 0 ] && echo -e "${RED}未检测到rclone程序.请重新运行脚本安装rclone.${END}" && exit 1
         check_dir_file "/root/.config/rclone/rclone.conf"
-        [ "$?" -ne 0 ] && echo -e "${RED}未检测到rclone配置文件.请重新运行脚本安                                                                                                                                                             装rclone.${END}" && exit 1
+        [ "$?" -ne 0 ] && echo -e "${RED}未检测到rclone配置文件.请重新运行脚本安装rclone.${END}" && exit 1
         return 0
 }
 
 check_emby(){
         check_dir_file "/usr/lib/systemd/system/emby-server.service"
-        [ "$?" -ne 0 ] && echo -e "${RED}未检测到Emby程序.请重新运行脚本安装Emby                                                                                                                                                             .${END}" && exit 1
+        [ "$?" -ne 0 ] && echo -e "${RED}未检测到Emby程序.请重新运行脚本安装Emby.${END}" && exit 1
         return 0
 }
 
 check_emby_local_version(){
         if [[ "${release}" == "centos" ]];then
-                emby_local_version=$(rpm -q emby-server | grep -Eo "[0-9.]+\.[0-                                                                                                                                                             9]+")
-        elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]];th                                                                                                                                                             en
-                emby_local_version=$(dpkg -l emby-server | grep -Eo "[0-9.]+\.[0                                                                                                                                                             -9]+")
+                emby_local_version=$(rpm -q emby-server | grep -Eo "[0-9.]+\.[0-9]+")
+        elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]];then
+                emby_local_version=$(dpkg -l emby-server | grep -Eo "[0-9.]+\.[0-9]+")
         else
                 echo "${RED}获取emby版本失败.暂时不支持您的操作系统.${END}"
         fi
@@ -88,7 +93,7 @@ setup_rclone(){
         if [[ ! -f /usr/bin/rclone ]];then
 
                 echo -e "正在下载rclone,请稍等..."
-                wget https://raw.githubusercontent.com/wuhuai2020/linux/master/r                                                                                                                                                             clone.tar.gz && tar zxvf rclone.tar.gz -C /usr/bin/
+                wget https://raw.githubusercontent.com/wuhuai2020/linux/master/rclone.tar.gz && tar zxvf rclone.tar.                                                                                                                         gz -C /usr/bin/
                 sleep 1s
                 rm -f rclone.tar.gz
         fi
@@ -106,7 +111,7 @@ setup_rclone(){
                 echo
                 echo -e "正在下载rclone配置文件，请稍等..."
                 sleep 1s
-                wget https://raw.githubusercontent.com/wuhuai2020/linux/master/r                                                                                                                                                             clone.conf -P /root/.config/rclone/
+                wget https://raw.githubusercontent.com/wuhuai2020/linux/master/rclone.conf -P /root/.config/rclone/
         fi
         if [[ -f /root/.config/rclone/rclone.conf ]];then
                 sleep 1s
@@ -124,7 +129,7 @@ setup_rclone(){
 
 setup_emby(){
 
-        emby_version=`curl -s https://github.com/MediaBrowser/Emby.Releases/rele                                                                                                                                                             ases/ | grep -Eo "tag/[0-9.]+\">([0-9.]+.*)" | grep -v "beta"|grep -Eo "[0-9.]+"                                                                                                                                                             |head -n1`
+        emby_version=`curl -s https://github.com/MediaBrowser/Emby.Releases/releases/ | grep -Eo "tag/[0-9.]+\">([0-                                                                                                                         9.]+.*)" | grep -v "beta"|grep -Eo "[0-9.]+"|head -n1`
         centos_packet_file="emby-server-rpm_${emby_version}_x86_64.rpm"
         debian_packet_file="emby-server-deb_${emby_version}_amd64.deb"
         url="https://github.com/MediaBrowser/Emby.Releases/releases/download"
@@ -141,20 +146,20 @@ setup_emby(){
                         return 0
                 else
                         sleep 1s
-                        echo -e "已安装版本为：${RED}${emby_local_version}${END}                                                                                                                                                             .最新版本为：${RED}${emby_version}${END}.正在为您更新..."
+                        echo -e "已安装版本为：${RED}${emby_local_version}${END}.最新版本为：${RED}${emby_version}${                                                                                                                         END}.正在为您更新..."
                         echo
                 fi
         fi
-        echo -e "您的系统是 ${RED}${release}${END}。正在为您准备安装包,请稍等...                                                                                                                                                             "
+        echo -e "您的系统是 ${RED}${release}${END}。正在为您准备安装包,请稍等..."
         if [[ "${release}" = "debian" ]];then
                 if [[ "${sys}" = "x86_64" ]];then
-                        wget -c "${debian_url}" && dpkg -i "${debian_packet_file                                                                                                                                                             }"
+                        wget -c "${debian_url}" && dpkg -i "${debian_packet_file}"
                         sleep 1s
                         rm -f "${debian_packet_file}"
                 fi
         elif [[ "${release}" = "ubuntu" ]];then
                 if [[ "${sys}" = "x86_64" ]];then
-                        wget -c "${debian_url}" && dpkg -i "${debian_packet_file                                                                                                                                                             }"
+                        wget -c "${debian_url}" && dpkg -i "${debian_packet_file}"
                         sleep 1s
                         rm -f "${debian_packet_file}"
                 fi
@@ -165,7 +170,7 @@ setup_emby(){
                         rm -f "${centos_packet_file}"
                 fi
         fi
-        echo -e "Emby安装成功.您可以访问 ${RED}https://${ip_addr}:8096/${END} 进                                                                                                                                                             一步配置Emby."
+        echo -e "Emby安装成功.您可以访问 ${RED}https://${ip_addr}:8096/${END} 进一步配置Emby."
 
 }
 
@@ -179,7 +184,7 @@ create_rclone_service(){
 
 
 
-        for item in $(sed -n "/\[.*\]/p" ~/.config/rclone/rclone.conf | grep -Eo                                                                                                                                                              "[0-9A-Za-z-]+")
+        for item in $(sed -n "/\[.*\]/p" ~/.config/rclone/rclone.conf | grep -Eo "[0-9A-Za-z-]+")
         do
                 list[i]=${item}
                 i=$((i+1))
@@ -198,22 +203,22 @@ create_rclone_service(){
 
 
                         echo
-                        read -n3 -p "请选择需要挂载的网盘（输入数字即可）：" rcl                                                                                                                                                             one_config_name
-                        if [ ${rclone_config_name} -le ${#list[@]} ] && [ -n ${r                                                                                                                                                             clone_config_name} ];then
-                                echo -e "您选择了：${RED}${list[rclone_config_na                                                                                                                                                             me]}${END}"
+                        read -n3 -p "请选择需要挂载的网盘（输入数字即可）：" rclone_config_name
+                        if [ ${rclone_config_name} -le ${#list[@]} ] && [ -n ${rclone_config_name} ];then
+                                echo -e "您选择了：${RED}${list[rclone_config_name]}${END}"
                                 break
                         fi
                         echo
                         echo "输入不正确，请重新输入。"
                         echo
                 done
-                read -p "请输入需要挂载目录的路径（如不是绝对路径则挂载到/mnt下                                                                                                                                                             ）:" path
+                read -p "请输入需要挂载目录的路径（如不是绝对路径则挂载到/mnt下）:" path
                 if [[ "${path:0:1}" != "/" ]];then
                         path="/mnt/${path}"
                 fi
                 while [[ 0 ]]
                 do
-                        echo -e "您选择了 ${RED}${list[rclone_config_name]}${END                                                                                                                                                             } 网盘，挂载路径为 ${RED}${path}${END}."
+                        echo -e "您选择了 ${RED}${list[rclone_config_name]}${END} 网盘，挂载路径为 ${RED}${path}${EN                                                                                                                         D}."
                         read -n1 -p "确认无误[Y/n]:" result
                         echo
                         case ${result} in
@@ -243,25 +248,25 @@ create_rclone_service(){
 
 
         echo "正在检查服务是否存在..."
-        if [[ -f /lib/systemd/system/rclone-${list[rclone_config_name]}.service                                                                                                                                                              ]];then
-                echo -e "找到服务 \"${RED}rclone-${list[rclone_config_name]}.ser                                                                                                                                                             vice${END}\"正在删除，请稍等..."
-                systemctl stop rclone-${list[rclone_config_name]}.service &> /de                                                                                                                                                             v/null
-                systemctl disable rclone-${list[rclone_config_name]}.service &>                                                                                                                                                              /dev/null
-                rm /lib/systemd/system/rclone-${list[rclone_config_name]}.servic                                                                                                                                                             e &> /dev/null
+        if [[ -f /lib/systemd/system/rclone-${list[rclone_config_name]}.service ]];then
+                echo -e "找到服务 \"${RED}rclone-${list[rclone_config_name]}.service${END}\"正在删除，请稍等..."
+                systemctl stop rclone-${list[rclone_config_name]}.service &> /dev/null
+                systemctl disable rclone-${list[rclone_config_name]}.service &> /dev/null
+                rm /lib/systemd/system/rclone-${list[rclone_config_name]}.service &> /dev/null
                 sleep 2s
                 echo -e "删除成功。"
         fi
-        echo -e "正在创建服务 \"${RED}rclone-${list[rclone_config_name]}.service                                                                                                                                                             ${END}\"请稍等..."
+        echo -e "正在创建服务 \"${RED}rclone-${list[rclone_config_name]}.service${END}\"请稍等..."
         echo "[Unit]
         Description = rclone-sjhl
 
         [Service]
         User = root
-        ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} -                                                                                                                                                             -transfers 10  --buffer-size 1G --vfs-read-chunk-size 256M --vfs-read-chunk-size                                                                                                                                                             -limit 2G  --allow-non-empty --allow-other --dir-cache-time 12h --umask 000
+        ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --transfers 10  --buffer-size 1G --vf                                                                                                                         s-read-chunk-size 256M --vfs-read-chunk-size-limit 2G  --allow-non-empty --allow-other --dir-cache-time 12h --umask                                                                                                                          000
         Restart = on-abort
 
         [Install]
-        WantedBy = multi-user.target" > /lib/systemd/system/rclone-${list[rclone                                                                                                                                                             _config_name]}.service
+        WantedBy = multi-user.target" > /lib/systemd/system/rclone-${list[rclone_config_name]}.service
         sleep 2s
         echo "服务创建成功。"
         if [ ! -f /etc/fuse.conf ]; then
@@ -269,7 +274,7 @@ create_rclone_service(){
                 sleep 1s
                 if [[ "${release}" = "centos" ]];then
                         yum install fuse -y
-                elif [[ "${release}" = "debian" || "${release}" = "ubuntu" ]];th                                                                                                                                                             en
+                elif [[ "${release}" = "debian" || "${release}" = "ubuntu" ]];then
                         apt-get install fuse -y
                 fi
                 echo
@@ -285,7 +290,7 @@ create_rclone_service(){
         systemctl enable rclone-${list[rclone_config_name]}.service &> /dev/null
         if [[ $? ]];then
                 echo
-                echo -e "已为网盘 ${RED}${list[rclone_config_name]}${END} 创建服                                                                                                                                                             务 ${RED}reclone-${list[rclone_config_name]}.service${END}.并已添加开机挂载.\n您                                                                                                                                                             可以通过 ${RED}systemctl [start|stop|status]${END} 进行挂载服务管理。"
+                echo -e "已为网盘 ${RED}${list[rclone_config_name]}${END} 创建服务 ${RED}reclone-${list[rclone_confi                                                                                                                         g_name]}.service${END}.并已添加开机挂载.\n您可以通过 ${RED}systemctl [start|stop|status]${END} 进行挂载服务管理。"
                 echo
                 echo
                 sleep 2s
@@ -308,10 +313,6 @@ renew_emby(){
          else
                  echo -e "${RED}未知错误.还原失败!${END}"
         fi
-}
-untar(){
-        total_size=`du -sk $1 | awk '{print $1}'`
-        pv -s $((${total_size} * 1024)) $1 | tar zxf - -C $2
 }
 copy_emby_config(){
         nfo_db_path="/home/Emby"
@@ -340,36 +341,39 @@ copy_emby_config(){
                 mv /var/lib/emby /var/lib/emby.bak
                 mv /opt/emby-server /opt/emby-server.bak
                 sleep 2s
-                echo -e "已将 ${RED}/var/lib/emby${END} 和 ${RED}/opt/emby-serve                                                                                                                                                             r${END} 分别备份到当前目录."
+                echo -e "已将 ${RED}/var/lib/emby${END} 和 ${RED}/opt/emby-server${END} 分别备份到当前目录."
                 echo
         elif  [ -d /var/lib/emby.bak ] && [ -d /opt/emby-server.bak ];then
                 echo -e "已备份，无需备份."
                 sleep 2s
         fi
-        echo -e "正在安装削刮库到 ${RED}${nfo_db_path}${END} 需要很长时间,请耐心                                                                                                                                                             等待..."
+        echo -e "正在安装削刮库到 ${RED}${nfo_db_path}${END} 需要很长时间,请耐心等待..."
         if [ ! -d "${nfo_db_path}" ];then
                 mkdir ${nfo_db_path}
         fi
         if [  -d ${db_path} ];then
                 if [ -f "${db_path}${nfo_db_file}" ];then
                         untar ${db_path}${nfo_db_file}  ${nfo_db_path}
-                        #tar -xzf ${db_path}${nfo_db_file} -C ${nfo_db_path}
                 else
-                        echo -e "未能找到削刮包 ${RED}${db_path}${nfo_db_file}${                                                                                                                                                             END} 请确认无误后重新运行脚本."
+                        echo -e "未能找到削刮包 ${RED}${db_path}${nfo_db_file}${END} 请确认无误后重新运行脚本."
                         echo
                         renew_emby
                         exit 1
                 fi
-                echo -e "Emby削刮包安装完成."
+                if [ "$?" -eq 0 ];then
+                        echo -e "Emby削刮包安装完成."
+                else
+                        echo "异常退出.请检查挂载并从新运行脚本."
+                        exit 1
+                fi
                 echo
 
                 sleep 2s
                 echo -e "正在配置emby程序.请稍等..."
                 if [ -f ${db_path}${opt_file} ];then
                         untar ${db_path}${opt_file} /opt
-                        #tar -xzf ${db_path}${opt_file} -C /opt
                 else
-                        echo -e "未能找到削刮包 ${RED}${db_path}${opt_file}${END                                                                                                                                                             } 请确认无误后重新运行脚本."
+                        echo -e "未能找到削刮包 ${RED}${db_path}${opt_file}${END} 请确认无误后重新运行脚本."
                         echo
                         renew_emby
                         exit 1
@@ -378,19 +382,24 @@ copy_emby_config(){
 
                 if [ -f ${db_path}${var_config_file} ];then
                         untar ${db_path}${var_config_file} /var/lib
-                        #tar -xzf ${db_path}${var_config_file} -C /var/lib
                 else
-                        echo -e "未能找到削刮包 ${RED}${db_path}${var_config_fil                                                                                                                                                             e}${END} 请确认无误后重新运行脚本."
+                        echo -e "未能找到削刮包 ${RED}${db_path}${var_config_file}${END} 请确认无误后重新运行脚本."
                         echo
                         renew_emby
                         exit 1
 
                 fi
-                echo -e "Emby程序配置完成."
+
+                if [ "$?" -eq 0 ];then
+                        echo -e "Emby程序配置完成."
+                else
+                        echo "异常退出.请检查挂载并从新运行脚本."
+                        exit 1
+                fi
                 echo
 
         else
-                echo -e "未找到 ${RED}${db_path}${END},请检查是否正确挂载。确认                                                                                                                                                             无误后重新执行脚本."
+                echo -e "未找到 ${RED}${db_path}${END},请检查是否正确挂载。确认无误后重新执行脚本."
                 echo
                 renew_emby
                 exit 1
@@ -403,7 +412,7 @@ copy_emby_config(){
         sleep 1s
         echo -e "配置完成."
         echo
-        echo -e "访问地址为:${RED}http://${ip_addr}:8096。账号：admin 密码为空${                                                                                                                                                             END}"
+        echo -e "访问地址为:${RED}http://${ip_addr}:8096。账号：admin 密码为空${END}"
 }
 menu_go_on(){
         echo
@@ -424,11 +433,11 @@ menu(){
         clear
         echo
         echo
-        echo -e "   ${RED}+-----------------------------------------------+${END                                                                                                                                                             }"
-        echo -e "   ${RED}|                                               |${END                                                                                                                                                             }"
-        echo -e "   ${RED}|      欢迎使用一键安装Rclone、Emby脚本         |${END                                                                                                                                                             }"
-        echo -e "   ${RED}|                                               |${END                                                                                                                                                             }"
-        echo -e "   ${RED}+-----------------------------------------------+${END                                                                                                                                                             }"
+        echo -e "   ${RED}+-----------------------------------------------+${END}"
+        echo -e "   ${RED}|                                               |${END}"
+        echo -e "   ${RED}|      欢迎使用一键安装Rclone、Emby脚本         |${END}"
+        echo -e "   ${RED}|                                               |${END}"
+        echo -e "   ${RED}+-----------------------------------------------+${END}"
         echo
         echo -e "${RED}      主菜单：${END}"
         echo -e "${RED}          【1】安装Rclone.${END}"
