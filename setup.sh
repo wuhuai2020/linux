@@ -1,5 +1,6 @@
 #!/bin/bash
 RED='\E[1;31m'
+RED_W='\E[41;37m'
 END='\E[0m'
 release=''
 sys=''
@@ -213,25 +214,26 @@ create_rclone_service(){
                 while [[ 0 ]]
                 do
                         echo
-                        echo -e "本地已配置网盘列表:"
+                        echo -e "   本地已配置网盘列表:"
                         echo
                         for((j=1;j<=${#list[@]};j++))
                         do
-                                echo -e "${RED}${j}：【${list[j]}】${END}"
+                                echo -e "      ${RED}${j}：[${list[j]}]${END}"
+                                echo
                         done
 
 
                         echo
-                        read -n3 -p "请选择需要挂载的网盘（输入数字即可）：" rclone_config_name
+                        read -n3 -p "   请选择需要挂载的网盘（输入数字即可）：" rclone_config_name
                         if [ ${rclone_config_name} -le ${#list[@]} ] && [ -n ${rclone_config_name} ];then
                                 echo -e "`curr_date` 您选择了：${RED}${list[rclone_config_name]}${END}"
                                 break
                         fi
                         echo
-                        echo "输入不正确，请重新输入。"
+                        echo "  输入不正确，请重新输入。"
                         echo
                 done
-                read -p "请输入需要挂载目录的路径（如不是绝对路径则挂载到/mnt下）:" path
+                read -p "  请输入需要挂载目录的路径（如不是绝对路径则挂载到/mnt下）:" path
                 if [[ "${path:0:1}" != "/" ]];then
                         path="/mnt/${path}"
                 fi
@@ -452,27 +454,29 @@ menu(){
         clear
         echo
         echo
-        echo -e "   ${RED}+-----------------------------------------------+${END}"
-        echo -e "   ${RED}|                                               |${END}"
-        echo -e "   ${RED}|                                               |${END}"
-        echo -e "   ${RED}|      欢迎使用一键安装Rclone、Emby脚本         |${END}"
-        echo -e "   ${RED}|                                               |${END}"
-        echo -e "   ${RED}|                                               |${END}"
-        echo -e "   ${RED}+-----------------------------------------------+${END}"
+        echo -e "   ${RED_W}+-----------------------------------------------+${END}"
+        echo -e "   ${RED_W}|                                               |${END}"
+        echo -e "   ${RED_W}|                                               |${END}"
+        echo -e "   ${RED_W}|      欢迎使用一键安装Rclone、Emby脚本         |${END}"
+        echo -e "   ${RED_W}|                                               |${END}"
+        echo -e "   ${RED_W}|                                               |${END}"
+        echo -e "   ${RED_W}+-----------------------------------------------+${END}"
         echo
-        echo -e "${RED}      主菜单：${END}"
+        echo -e "   ${RED}[主菜单]：${END}"
         echo
-        echo -e "${RED}          【1】安装Rclone.${END}"
+        echo -e "        ${RED}+---------------------+${END}"
+        echo -e "        ${RED}| [1]：安装Rclone.    |${END}"
+        echo -e "        ${RED}+---------------------+${END}"
+        echo -e "        ${RED}| [2]：安装/更新Emby. |${END}"
+        echo -e "        ${RED}+---------------------+${END}"
+        echo -e "        ${RED}| [3]：安装Rclone服务.|${END}"
+        echo -e "        ${RED}+---------------------+${END}"
+        echo -e "        ${RED}| [4]：复制Emby削刮包.|${END}"
+        echo -e "        ${RED}+---------------------+${END}"
+        echo -e "        ${RED}| [5]：退出脚本.      |${END}"
+        echo -e "        ${RED}+---------------------+${END}"
         echo
-        echo -e "${RED}          【2】安装/更新Emby.${END}"
-        echo
-        echo -e "${RED}          【3】安装Rclone服务.${END}"
-        echo
-        echo -e "${RED}          【4】复制Emby削刮包.${END}"
-        echo
-        echo -e "${RED}          【5】退出脚本.${END}"
-        echo
-        read  -p "请选择输入菜单对应数字开始执行：" select_menu
+        read  -p "   请选择输入菜单对应数字开始执行：" select_menu
 
         check_release
         check_command pv
