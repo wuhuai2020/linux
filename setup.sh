@@ -108,9 +108,9 @@ setup_rclone(){
         if [[ -f /usr/bin/rclone ]];then
                 sleep 1s
                 echo
-                echo -e "`curr_date` 正Rclone安装成功."
+                echo -e "`curr_date` Rclone安装成功."
         else
-                echo -e "`curr_date` 正安装失败.请重新运行脚本安装."
+                echo -e "`curr_date` 安装失败.请重新运行脚本安装."
                 exit 1
         fi
 
