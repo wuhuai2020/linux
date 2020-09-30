@@ -71,9 +71,9 @@ check_emby(){
 
 check_emby_local_version(){
 	if [[ "${release}" == "centos" ]];then
-		emby_local_version=$(yum list emby-server | grep -Eo "[0-9.]+\.[0-9]+"|uniq)
+		emby_local_version=$(rpm -q emby-server | grep -Eo "[0-9.]+\.[0-9]+")
 	elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]];then
-		emby_local_version=$(apt list emby-server | grep -Eo "[0-9.]+\.[0-9]+")
+		emby_local_version=$(dpkg -l emby-server | grep -Eo "[0-9.]+\.[0-9]+")
 	else
 		echo "${RED}获取emby版本失败.暂时不支持您的操作系统.${END}"
 	fi
@@ -124,7 +124,7 @@ setup_rclone(){
 	
 setup_emby(){
 
-	emby_version=`curl -s https://github.com/MediaBrowser/Emby.Releases/releases/ | grep -Eo "tag/[0-9.]+\">([0-9.]+.*)" | grep -v "beta"|grep -Eo "[0-9.]+"|uniq`
+	emby_version=`curl -s https://github.com/MediaBrowser/Emby.Releases/releases/ | grep -Eo "tag/[0-9.]+\">([0-9.]+.*)" | grep -v "beta"|grep -Eo "[0-9.]+"|head -n1`
 	centos_packet_file="emby-server-rpm_${emby_version}_x86_64.rpm"
 	debian_packet_file="emby-server-deb_${emby_version}_amd64.deb"
 	url="https://github.com/MediaBrowser/Emby.Releases/releases/download"
@@ -145,7 +145,6 @@ setup_emby(){
 			echo 	
 		fi
 	fi
-
 	echo -e "您的系统是 ${RED}${release}${END}。正在为您准备安装包,请稍等..."
 	if [[ "${release}" = "debian" ]];then
 		if [[ "${sys}" = "x86_64" ]];then
