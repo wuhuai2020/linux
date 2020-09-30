@@ -335,7 +335,7 @@ copy_emby_config(){
         check_emby
 
         if [ -f /usr/lib/systemd/system/emby-server.service ];then
-                echo "停用Emby服务..."
+                echo "`curr_date` 停用Emby服务..."
                 systemctl stop emby-server.service
                 sleep 2s
                 echo -e "`curr_date` 已停用Emby服务"
