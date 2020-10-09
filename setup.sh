@@ -219,7 +219,7 @@ create_rclone_service(){
                         for((j=1;j<=${#list[@]};j++))
                         do
                                 echo -e "      ${RED}${j}：${list[j]}${END}"
-                                echo -e "      `red ------------`"
+                                echo -e "      `red ----------------------`"
                         done
 
 
