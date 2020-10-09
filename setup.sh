@@ -216,10 +216,20 @@ create_rclone_service(){
                         echo
                         echo -e "   本地已配置网盘列表:"
                         echo
+				echo -e "      `red +-------------------------+`"
                         for((j=1;j<=${#list[@]};j++))
                         do
-                                echo -e "      ${RED}${j}：${list[j]}${END}"
-                                echo -e "      `red ----------------------`"
+				temp="${j}：${list[j]}"
+				count=$((`echo "${temp}" | wc -m` -1))
+				if [[ "${count}" -le 6 ]];then
+					temp="${temp}\t\t\t"
+				elif [ "${count}" -gt 6 ] && [ "$count" -le 14 ];then
+					temp="${temp}\t\t"
+				elif [[ "${count}" -gt 14 ]];then
+					temp="${temp}\t"
+				fi
+                                echo -e "      ${RED}| ${temp}|${END}"
+                                echo -e "      `red +-------------------------+`"
                         done
 
 
