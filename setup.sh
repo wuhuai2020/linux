@@ -221,11 +221,11 @@ create_rclone_service(){
                         do
 				temp="${j}：${list[j]}"
 				count=$((`echo "${temp}" | wc -m` -1))
-				if [[ "${count}" -le 6 ]];then
+				if [ "${count}" -le 6 ];then
 					temp="${temp}\t\t\t"
 				elif [ "${count}" -gt 6 ] && [ "$count" -le 14 ];then
 					temp="${temp}\t\t"
-				elif [[ "${count}" -gt 14 ]];then
+				elif [ "${count}" -gt 14 ];then
 					temp="${temp}\t"
 				fi
                                 echo -e "      ${RED}| ${temp}|${END}"
