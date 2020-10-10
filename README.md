@@ -3,6 +3,8 @@
     
 ##  安装方法：
     wget http://www.e-11.tk/setup.sh && chmod u+x setup.sh && ./setup.sh
+    
+   如有问题请联系电报群 https://t.me/joinchat/MoZal1UXYXWVEIaD4Yo3Cw
 
 # 脚本功能介绍
 
