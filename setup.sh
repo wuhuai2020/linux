@@ -384,7 +384,7 @@ copy_emby_config(){
                 mv -f /var/lib/emby /var/lib/emby.bak
                 #mv -f /opt/emby-server /opt/emby-server.bak
                 sleep 2s
-                echo -e "`curr_date` 已将 ${RED}/var/lib/emby${END} 和 ${RED}/opt/emby-server${END} 分别备份到当前目录."
+                echo -e "`curr_date` 已将 ${RED}/var/lib/emby${END} 备份到当前目录."
                 echo
         elif  [ -d /var/lib/emby.bak ];then
                 echo -e "`curr_date` 已备份，无需备份."
