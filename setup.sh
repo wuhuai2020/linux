@@ -412,21 +412,12 @@ copy_emby_config(){
                 echo
 
                 sleep 2s
-                echo -e "`curr_date` 正在配置emby程序.请稍等..."
-                if [ -f ${db_path}${opt_file} ];then
-                        untar ${db_path}${opt_file} /opt
-                else
-                        echo -e "`curr_date` 未能找到削刮包 ${RED}${db_path}${opt_file}${END} 请确认无误后重新运行脚本."
-                        echo
-                        renew_emby
-                        exit 1
-
-                fi
+                echo -e "`curr_date` 正在安装emby配置文件.请稍等..."
 
                 if [ -f ${db_path}${var_config_file} ];then
                         untar ${db_path}${var_config_file} /var/lib
                 else
-                        echo -e "`curr_date` 未能找到削刮包 ${RED}${db_path}${var_config_file}${END} 请确认无误后重新运行脚本."
+                        echo -e "`curr_date` 未能找到配置文件包 ${RED}${db_path}${var_config_file}${END} 请确认无误后重新运行脚本."
                         echo
                         renew_emby
                         exit 1
