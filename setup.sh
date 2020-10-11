@@ -342,10 +342,10 @@ create_rclone_service(){
 #复制Emby配置文件
 #
 renew_emby(){
-        if [ -d /var/lib/emby.bak ] && [ -d /opt/emby-server.bak ];then
+        if [ -d /var/lib/emby.bak ];then
                  echo -e "`curr_date` 找到已备份的emby配置文件，正在还原..."
                  mv -f /var/lib/emby.bak /var/lib/emby
-                 mv -f /opt/emby-server.bak /opt/emby-server
+                 #mv -f /opt/emby-server.bak /opt/emby-server
                  systemctl start emby-server.service
                  echo
                  echo -e "`curr_date` 已还原Emby."
@@ -382,7 +382,7 @@ copy_emby_config(){
                 echo
                 echo -e "`curr_date` 已找到emby配置文件，正在备份..."
                 mv -f /var/lib/emby /var/lib/emby.bak
-                mv -f /opt/emby-server /opt/emby-server.bak
+                #mv -f /opt/emby-server /opt/emby-server.bak
                 sleep 2s
                 echo -e "`curr_date` 已将 ${RED}/var/lib/emby${END} 和 ${RED}/opt/emby-server${END} 分别备份到当前目录."
                 echo
