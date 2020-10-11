@@ -378,7 +378,7 @@ copy_emby_config(){
                 exit 1
         fi
 
-        if [ -d /var/lib/emby ] && [ -d /opt/emby-server ];then
+        if [ -d /var/lib/emby ];then
                 echo
                 echo -e "`curr_date` 已找到emby配置文件，正在备份..."
                 mv -f /var/lib/emby /var/lib/emby.bak
@@ -386,7 +386,7 @@ copy_emby_config(){
                 sleep 2s
                 echo -e "`curr_date` 已将 ${RED}/var/lib/emby${END} 和 ${RED}/opt/emby-server${END} 分别备份到当前目录."
                 echo
-        elif  [ -d /var/lib/emby.bak ] && [ -d /opt/emby-server.bak ];then
+        elif  [ -d /var/lib/emby.bak ];then
                 echo -e "`curr_date` 已备份，无需备份."
                 sleep 2s
         fi
