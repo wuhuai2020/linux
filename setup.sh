@@ -6,6 +6,22 @@ release=''
 sys=''
 ip_addr=''
 emby_local_version=''
+
+
+check_root(){
+	if [[ $EUID -ne 0 ]]; then
+ 	       echo -e "${Red}本脚本必须root账号运行，请切换root用户后再执行本脚本!${END}"
+	       exit 1
+	fi
+}
+
+check_vz(){
+	if [[ -d "/proc/vz" ]]; then
+		 echo -e "${Red}对不起，您的VPS是openVZ架构，不能使用该脚本!${END}"
+		 exit 1
+        fi
+}
+
 #
 #检查系统相关
 #
@@ -345,7 +361,6 @@ renew_emby(){
         if [ -d /var/lib/emby.bak ];then
                  echo -e "`curr_date` 找到已备份的emby配置文件，正在还原..."
                  mv -f /var/lib/emby.bak /var/lib/emby
-                 #mv -f /opt/emby-server.bak /opt/emby-server
                  systemctl start emby-server.service
                  echo
                  echo -e "`curr_date` 已还原Emby."
@@ -354,8 +369,30 @@ renew_emby(){
                  echo -e "`curr_date` ${RED}未知错误.还原失败!${END}"
         fi
 }
+get_nfo_db_path(){
+	echo
+	echo -e "请输入削刮包安装路径，留空则默认为 `red /home/Emby`.\n如果是相对路径则是默认在 `red /home` 目录下创建输入的目录名称."
+	read -p "请输入路径(例如:/mnt/xg)：" nfo_db_path
+	if [ -d /home/Emby ];then
+		temp_date=`date +%y%m%d%H%M%S`
+		echo
+		echo -e "找到 `red /home/Emby` 正备份为 `red /home/Emby_${temp_date}.bak`..."
+		sleep 1s
+		mv /home/Emby /home/Emby_${temp_date}.bak
+	fi	
+	if [ "${nfo_db_path}" == "" ];then
+		nfo_db_path="/home/Emby"
+	elif [ "${nfo_db_path:0:1}" != "/" ];then
+                nfo_db_path="/home/${nfo_db_path}"
+		echo -e "正在创建 `red ${nfo_db_path}` 链接到`red /home/Emby`"
+		ln -s "${nfo_db_path}" /home/Emby
+	else
+		ln -s "${nfo_db_path}" /home/Emby
+		echo -e "正在创建 `red ${nfo_db_path}` 链接到`red /home/Emby`"
+	fi
+}
+
 copy_emby_config(){
-        nfo_db_path="/home/Emby"
         db_path="/mnt/video/EmbyDatabase/"
         nfo_db_file="Emby削刮库.tar.gz"
         opt_file="Emby-server数据库.tar.gz"
@@ -364,7 +401,7 @@ copy_emby_config(){
 
 
         check_emby
-
+	get_nfo_db_path
         if [ -f /usr/lib/systemd/system/emby-server.service ];then
                 echo -e "`curr_date` 停用Emby服务..."
                 systemctl stop emby-server.service
@@ -382,7 +419,6 @@ copy_emby_config(){
                 echo
                 echo -e "`curr_date` 已找到emby配置文件，正在备份..."
                 mv -f /var/lib/emby /var/lib/emby.bak
-                #mv -f /opt/emby-server /opt/emby-server.bak
                 sleep 2s
                 echo -e "`curr_date` 已将 ${RED}/var/lib/emby${END} 备份到当前目录."
                 echo
@@ -448,6 +484,62 @@ copy_emby_config(){
         echo
         echo -e "访问地址为:${RED}http://${ip_addr}:8096。账号：admin 密码为空${END}"
 }
+
+
+add_swap(){
+	echo
+	echo -e "${RED}请输入需要添加的swap，建议为物理内存的2倍大小\n默认为KB，您也可以输入数字+[KB、MB、GB]的方式！（例如：4GB、4096MB、4194304KB）${END}"
+	read -p "请输入swap数值(MB):" size
+	echo
+	size=`echo ${size} | tr '[a-z]' '[A-Z]'`
+        size_unit=${size:0-2:2}
+        echo "${size_unit}" | grep -qE '^[0-9]+$'
+        if [ $? -eq 0 ];then
+               size="${size}MB"
+        else
+ 	       if [ "${size_unit}" != "GB" ] && [ "${size_unit}" != "MB" ] && [ "${size_unit}" != "KB" ];then
+		       echo -e "swap大小只能是数字+单位，并且单位只能是KB、MB、GB。请检查后重新输入。"
+                        add_swap
+                fi
+        fi
+	
+	
+	
+	grep -q "swapfile" /etc/fstab
+	if [ $? -ne 0 ];then
+		echo -e "`red 正在创建swapfile...`"
+		sleep 2s
+		fallocate -l ${size} /swapfile
+		chmod 600 /swapfile
+		mkswap /swapfile
+		swapon /swapfile
+		echo '/swapfile none swap defaults 0 0' >> /etc/fstab
+		echo -e "${RED}swap创建成功，信息如下：${END}"
+		cat /proc/swaps
+		cat /proc/meminfo | grep swap
+	else
+		echo -e "`red swapfile已存在，swap设置失败，请先运行脚本删除swap后重新设置！`"
+	fi
+}
+
+del_swap(){
+	grep -q "swapfile" /etc/fstab
+	if [ $? -eq 0 ];then
+		echo
+		echo -e "`red 正在删除SWAP空间...`"
+		sleep 2s
+		sed -i '/swapfile/d' /etc/fstab
+		echo "3" > /proc/sys/vm/drop_caches
+		swapoff -a
+		rm -f /wapfile
+		echo
+		echo -e "`red 删除成功！`"
+	else
+		echo
+		echo -e "`red 未找到swapfile，删除失败！`"
+	fi
+}
+
 menu_go_on(){
         echo
         echo -e "${RED}是否继续执行脚本?${END}"
@@ -462,6 +554,52 @@ menu_go_on(){
                         echo "输入错误"
                         menu_go_on;;
         esac
+}
+
+swap_menu(){
+        clear
+        echo
+        echo
+        echo -e "   ${RED_W}+-----------------------------------------------+${END}"
+        echo -e "   ${RED_W}|                                               |${END}"
+        echo -e "   ${RED_W}|                                               |${END}"
+        echo -e "   ${RED_W}|      欢迎使用一键安装Rclone、Emby脚本         |${END}"
+        echo -e "   ${RED_W}|                                               |${END}"
+        echo -e "   ${RED_W}|                                               |${END}"
+        echo -e "   ${RED_W}+-----------------------------------------------+${END}"
+        echo
+        echo -e "   ${RED}[当前位置:主菜单 >> SWAP配置]：${END}"
+        echo
+        echo -e "        ${RED}+---------------------+${END}"
+        echo -e "        ${RED}| [1]：添加SWAP空间.  |${END}"
+        echo -e "        ${RED}+---------------------+${END}"
+        echo -e "        ${RED}| [2]：删除SWAP空间.  |${END}"
+        echo -e "        ${RED}+---------------------+${END}"
+        echo -e "        ${RED}| [3]：返回主菜单.    |${END}"
+        echo -e "        ${RED}+---------------------+${END}"
+        echo
+        read  -p "   请选择输入菜单对应数字开始执行：" select_swap
+	check_vz
+	case "${select_swap}" in
+		1)
+			add_swap;;
+		2)
+			del_swap;;
+		3)
+			menu;;
+		*)
+			echo -e "选择错误，请重新输入！"
+			swap_menu;;
+	esac
+	echo
+	read -n1 -p "是否返回主菜单(按 Y 返回主菜单，其它任意键继续执行SWAP配置)[Y]..." rturn
+	
+	case "${rturn}" in
+		Y | y)
+			menu;;
+		*)
+			swap_menu;;
+	esac
 }
 menu(){
         clear
@@ -486,11 +624,13 @@ menu(){
         echo -e "        ${RED}+---------------------+${END}"
         echo -e "        ${RED}| [4]：复制Emby削刮包.|${END}"
         echo -e "        ${RED}+---------------------+${END}"
-        echo -e "        ${RED}| [5]：退出脚本.      |${END}"
+        echo -e "        ${RED}| [5]：swap配置.      |${END}"
+        echo -e "        ${RED}+---------------------+${END}"
+        echo -e "        ${RED}| [6]：退出脚本.      |${END}"
         echo -e "        ${RED}+---------------------+${END}"
         echo
         read  -p "   请选择输入菜单对应数字开始执行：" select_menu
-
+	check_root
         check_release
         check_command pv
         check_command curl
@@ -506,7 +646,9 @@ menu(){
                         create_rclone_service;;
                 4)
                         copy_emby_config;;
-                5)
+		5)
+			swap_menu;;
+                6)
                         exit 1;;
                 *)
                         echo
