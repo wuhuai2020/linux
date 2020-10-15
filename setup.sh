@@ -30,6 +30,8 @@ check_release(){
                release='centos'
        elif cat /etc/issue | grep -q -E -i "debian"; then
                release='debian'
+       elif cat /etc/issue | grep -q -E -i "armbian";then
+	       release='armdebian'
        elif cat /etc/issue | grep -q -E -i "ubuntu"; then
                release='ubuntu'
        elif cat /etc/issue | grep -q -E -i "redhat|red hat|centos";then
@@ -51,7 +53,7 @@ check_command(){
                 echo -e "`curr_date` ${RED}$1${END} 不存在.正在为您安装，请稍后..."
                 if [[ "${release}" = "centos" ]];then
                         yum install $1 -y
-                elif [[ "${release}" = "debian" || "${release}" = "ubuntu" ]];then
+                elif [[ "${release}" = "debian" || "${release}" = "ubuntu" ||  "${release}" = "armdebian" ]];then
                         apt-get install $1 -y
                 else
                         echo -e "`curr_date` ${RED}对不起！您的系统暂不支持该脚本，请联系作者做定制优化，谢谢！${END}"
@@ -93,7 +95,7 @@ check_emby(){
 check_emby_local_version(){
         if [[ "${release}" == "centos" ]];then
                 emby_local_version=$(rpm -q emby-server | grep -Eo "[0-9.]+\.[0-9]+")
-        elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]];then
+        elif [[ "${release}" == "debian" ]] || [[ "${release}" == "ubuntu" ]] || [[ "${release}" == "armdebian" ]];then
                 emby_local_version=$(dpkg -l emby-server | grep -Eo "[0-9.]+\.[0-9]+")
         else
                 echo -e "${RED}获取emby版本失败.暂时不支持您的操作系统.${END}"
@@ -115,11 +117,16 @@ curr_date(){
 setup_rclone(){
 
         if [[ ! -f /usr/bin/rclone ]];then
-
                 echo -e "`curr_date` 正在下载rclone,请稍等..."
-                wget http://www.e-11.tk/rclone.tar.gz && tar zxvf rclone.tar.gz -C /usr/bin/
-                sleep 1s
-                rm -f rclone.tar.gz
+		if [ "${release}" != "armdebian" ];then
+                	wget http://www.e-11.tk/rclone.tar.gz && tar zxvf rclone.tar.gz -C /usr/bin/
+
+                	sleep 1s
+                	rm -f rclone.tar.gz
+		else
+			wget http://www.e-11.tk/rclone && mv ./rclone /usr/bin/ && chmod 777 /usr/bin/rclone
+		fi
+
 
                 if [[ -f /usr/bin/rclone ]];then
                         sleep 1s
@@ -165,8 +172,10 @@ setup_emby(){
         emby_version=`curl -s https://github.com/MediaBrowser/Emby.Releases/releases/ | grep -Eo "tag/[0-9.]+\">([0-9.]+.*)" | grep -v "beta"|grep -Eo "[0-9.]+"|head -n1`
         centos_packet_file="emby-server-rpm_${emby_version}_x86_64.rpm"
         debian_packet_file="emby-server-deb_${emby_version}_amd64.deb"
+	armdebian64_packet_file="emby-server-deb_${emby_version}_arm64.deb"
         url="https://github.com/MediaBrowser/Emby.Releases/releases/download"
         debian_url="${url}/${emby_version}/${debian_packet_file}"
+        armdebian64_url="${url}/${emby_version}/${armdebian64_packet_file}"
         centos_url="${url}/${emby_version}/${centos_packet_file}"
 
         check_emby_local_version
@@ -191,6 +200,11 @@ setup_emby(){
                         sleep 1s
                         rm -f "${debian_packet_file}"
                 fi
+	elif [[ "${release}" = "armdebian" ]];then
+		if [[ "${sys}" = "aarch64" ]];then
+			
+                        wget -c "${armdebian64_url}" && dpkg -i "${armdebian64_packet_file}"
+		fi
         elif [[ "${release}" = "ubuntu" ]];then
                 if [[ "${sys}" = "x86_64" ]];then
                         wget -c "${debian_url}" && dpkg -i "${debian_packet_file}"
