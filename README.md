@@ -1,4 +1,4 @@
-# linux实用脚本
+# 一键安装Emby、rclone、自动挂载rclone脚本
     linux一键安装rclone、emby、配置rclone挂载服务
     
 ##  安装方法：
