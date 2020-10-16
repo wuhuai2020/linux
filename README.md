@@ -2,7 +2,7 @@
     linux一键安装rclone、emby、配置rclone挂载服务
     
 ##  安装方法：
-    wget http://www.e-11.tk/setup.sh && chmod u+x setup.sh && ./setup.sh
+    bash <(curl -s -L https://git.io/11plus.sh)
 
   如有问题请联系 [电报群](https://t.me/P11DrivePlus "电报群地址")
 # 脚本功能介绍
