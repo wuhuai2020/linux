@@ -69,21 +69,33 @@ mount(){
 	df -h | grep -q "${remote}:"
     	if [ $? -eq 0 ];then
 		echo -e "`red ${remote}` 挂载状态: `red 正常`"
-		echo -e "挂载服务地址: `red /usr/bin/${this_name}`\n挂载路径: `red ${path}`\n您可以直接使用${this_name} `red 'start|stop|restart|status'` 来管理服务."
+		echo -e "挂载服务地址: `red /usr/bin/${this_name}`\n挂载路径: `red ${path}`\n您可以直接使用${this_name} `red 'start|stop|restart|status|remove'` 来管理服务."
 	else
 		echo -e "`red ${this_name}` 挂载状态 `red 异常`\n请尝试使用 ${this_name} restart重启脚本."
-		
 	fi
-	
+}
+11plus_remove(){
+	11plus_stop
+	echo
+	echo -e "`red 正在删除服务${this_name}...`"
+	rm -f $0
+	sleep 2s
+	echo
+	if [ -f "/usr/bin/${this_name}" ];then
+		echo -e "`red 删除失败.请联系脚本作者排查原因！`"
+		echo
+		exit 1
+	else
+		echo -e "`red ${this_name}删除成功！`" 
+	fi
 }
 
-
 case $1 in
-	start | stop | restart | status)
+	start | stop | restart | status | remove)
 		11plus_$1;;
 	*)
 		echo
-		echo "输入错误，脚本只支持 `red 'start|stop|restart|status'`.请从新运行脚本."
+		echo "输入错误，脚本只支持 `red 'start|stop|restart|status|remove'`.请从新运行脚本."
 		echo
 		exit 1
 esac
