@@ -43,8 +43,8 @@ red(){
 11plus_stop(){
 	echo -e "`red 正在停用${remote}挂载,请稍等...`"
 	echo
-	sleep 2s
 	fusermount -qzu "${path}" > /dev/null 2>&1
+	sleep 3s
 	ps -ef | grep -v grep | grep -q "${remote}"
 	if [ "$?" -eq "0" ];then
 		echo -e "`red 停用${this_name}服务失败，请联系脚本作者排查原因。`"
