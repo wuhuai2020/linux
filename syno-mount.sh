@@ -94,7 +94,7 @@ start(){
 		/usr/bin/${list[rclone_config_index]}-rcloned start
 		echo -e "正在添加开机启动..."
 		sed -i "/${list[rclone_config_index]}-rcloned/d" /etc/rc
-		sed -i "/exit 0/i\/usr/bin/${list[rclone_config_index]}-rcloned" /etc/rc
+		sed -i "/exit 0/i\/usr/bin/${list[rclone_config_index]}-rcloned\ start" /etc/rc
 		sleep 2s
 		echo
 		echo -e "`red 已添加开机启动.`"
