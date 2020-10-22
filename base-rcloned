@@ -1,16 +1,11 @@
 #!/bin/bash
 
-
 RED='\E[1;31m'
 RED_W='\E[41;37m'
 END='\E[0m'
-
-[ -x "$(which fusermount)" ] || exit 1;
-[ -x "$(which rclone)" ] || exit 1;
-
-
-remote="OD-itthos01" && path="/volume1/od-itthos01"
+remote="" && path=""
 this_name=`basename $0`
+
 curr_date(){
         curr_date=`date +[%Y-%m-%d"_"%H:%M:%S]`
         echo -e "`red $(date +[%Y-%m-%d_%H:%M:%S])`"
