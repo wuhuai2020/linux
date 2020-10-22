@@ -70,7 +70,7 @@ mount(){
 	df -h | grep -q "${remote}:"
     	if [ $? -eq 0 ];then
 		echo -e "`red ${remote}` 挂载状态: `red 正常`"
-		echo -e "挂载服务地址: `red /usr/bin/${this_name}`\n挂载路径: `red ${path}`\n您可以直接使用${this_name} `red start|stop|restart|status` 来管理服务."
+		echo -e "挂载服务地址: `red /usr/bin/${this_name}`\n挂载路径: `red ${path}`\n您可以直接使用${this_name} `red 'start|stop|restart|status'` 来管理服务."
 	else
 		echo -e "`red ${this_name}` 挂载状态 `red 异常`"
 		
