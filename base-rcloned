@@ -1,0 +1,67 @@
+#!/bin/bash
+
+
+RED='\E[1;31m'
+RED_W='\E[41;37m'
+END='\E[0m'
+
+[ -x "$(which fusermount)" ] || exit 1;
+[ -x "$(which rclone)" ] || exit 1;
+
+
+remote="OD-itthos01" && path="/volume1/od-itthos01"
+this_name=`basename $0`
+curr_date(){
+        curr_date=`date +[%Y-%m-%d"_"%H:%M:%S]`
+        echo -e "`red $(date +[%Y-%m-%d_%H:%M:%S])`"
+}
+red(){
+        echo -e "${RED}${1}${END}"
+}
+
+11plus_start(){
+	echo -e "`red 正在为您创建服务,请稍等...`"
+	echo
+	fusermount -qzu "${path}" > /dev/null 2>&1
+	rclone mount "${remote}": "${path}" --transfers 10  --buffer-size 1G --vfs-read-chunk-size 256M --vfs-read-chunk-size-limit 2G  --allow-non-empty --allow-other --dir-cache-time 12h --umask 000 >/dev/null 2>&1 & 
+	sleep 3s
+    ps -ef | grep -v grep | grep -q "${remote}"
+	if [ "$?" -eq "0" ];then
+		echo -e "已将 `red ${remote}` 挂载到 `red ${path}`."
+	else
+		echo -e "`red 挂载失败。请联系脚本作者排查原因！`"
+	fi
+	echo
+}
+
+11plus_stop(){
+	echo -e "`red 正在停用${remote}挂载,请稍等...`"
+	echo
+	sleep 2s
+	fusermount -qzu "${path}" > /dev/null 2>&1
+	ps -ef | grep -v grep | grep -q "${remote}"
+	if [ "$?" -eq "0" ];then
+		echo -e "`red 停用${this_name}服务失败，请联系脚本作者排查原因。`"
+	else
+		echo -e "`red 停用${this_name}成功！`"
+	fi
+	echo
+}
+
+11plus_restart(){
+	echo -e "restart"
+}
+11plus_status(){
+	echo -e "status"
+}
+
+
+case $1 in
+	start | stop | restart | status)
+		11plus_$1;;
+	*)
+		echo
+		echo "输入错误，脚本只支持 `red 'start|stop|restart|status'`.请从新运行脚本."
+		echo
+		exit 1
+esac
