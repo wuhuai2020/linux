@@ -52,11 +52,9 @@ mount(){
         	sleep 3s
         	echo -e "`red 停用${this_name}成功！`"
 		echo
-        	exit 0
     	else
         	echo -e "`red ${remote}` 未挂载，勿需停用服务。"
         	echo
-        	exit 1
     	fi
 }
 
