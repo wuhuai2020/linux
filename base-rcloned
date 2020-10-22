@@ -13,9 +13,20 @@ curr_date(){
 red(){
         echo -e "${RED}${1}${END}"
 }
-
+mount(){
+	fusermount -qzu "${path}" > /dev/null 2>&1
+	rclone mount "${remote}": "${path}" --transfers 10  --buffer-size 1G --vfs-read-chunk-size 256M --vfs-read-chunk-size-limit 2G  --allow-non-empty --allow-other --dir-cache-time 12h --umask 000 >/dev/null 2>&1 & 
+	sleep 3s
+    	ps -ef | grep -v grep | grep -q "${remote}"
+	if [ "$?" -eq "0" ];then
+		echo -e "已将 `red ${remote}` 挂载到 `red ${path}`."
+	else
+		echo -e "`red 挂载失败。请联系脚本作者排查原因！`"
+		exit 1
+	fi
+}
 11plus_start(){
-	echo -e "`red 正在为您创建服务,请稍等...`"
+	echo -e "`red 正在为您创建挂载服务,请稍等...`"
 	echo
 	if [[ ! -d ${path} ]];then
             echo
@@ -26,16 +37,7 @@ red(){
             echo -e "`curr_date` 创建完成！"
 	    echo
     	fi
-	fusermount -qzu "${path}" > /dev/null 2>&1
-	rclone mount "${remote}": "${path}" --transfers 10  --buffer-size 1G --vfs-read-chunk-size 256M --vfs-read-chunk-size-limit 2G  --allow-non-empty --allow-other --dir-cache-time 12h --umask 000 >/dev/null 2>&1 & 
-	sleep 3s
-    ps -ef | grep -v grep | grep -q "${remote}"
-	if [ "$?" -eq "0" ];then
-		echo -e "已将 `red ${remote}` 挂载到 `red ${path}`."
-	else
-		echo -e "`red 挂载失败。请联系脚本作者排查原因！`"
-		exit 1
-	fi
+	mount
 	echo
 	exit 0
 }
@@ -60,7 +62,9 @@ red(){
 }
 
 11plus_restart(){
-	echo -e "restart"
+	echo -e "`red 正在重新挂载,请稍等...`"
+	echo
+	mount
 }
 11plus_status(){
 	echo -e "status"
