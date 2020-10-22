@@ -33,8 +33,10 @@ red(){
 		echo -e "已将 `red ${remote}` 挂载到 `red ${path}`."
 	else
 		echo -e "`red 挂载失败。请联系脚本作者排查原因！`"
+		exit 1
 	fi
 	echo
+	exit 0
 }
 
 11plus_stop(){
