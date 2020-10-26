@@ -649,6 +649,7 @@ menu(){
 	check_root
         check_release
         check_command pv
+	check_command tar
         check_command curl
         check_command wget
 
