@@ -218,7 +218,7 @@ setup_emby(){
                         rm -f "${centos_packet_file}"
                 fi
         fi
-        echo -e "Emby安装成功.您可以访问 ${RED}https://${ip_addr}:8096/${END} 进一步配置Emby."
+        echo -e "Emby安装成功.您可以访问 ${RED}http://${ip_addr}:8096/${END} 进一步配置Emby."
 
 }
 
