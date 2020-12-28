@@ -325,12 +325,20 @@ create_rclone_service(){
         fi
         echo -e "`curr_date` 正在创建服务 \"${RED}rclone-${list[rclone_config_name]}.service${END}\"请稍等..."
         echo "[Unit]
-        Description = rclone-sjhl
+        Description = rclone mount for ${list[rclone_config_name]}
+	AssertPathIsDirectory=${path}
+	Wants=network-online.target
+	After=network-online.target
 
         [Service]
+	Type=notify
+	KillMode=none
+	Restart=on-failure
+	RestartSec=5
         User = root
-        ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --transfers 10  --buffer-size 1G --vfs-read-chunk-size 256M --vfs-read-chunk-size-limit 2G  --allow-non-empty --allow-other --dir-cache-time 12h --umask 000
-        Restart = on-abort
+        ExecStart = /usr/bin/rclone mount ${list[rclone_config_name]}: ${path} --umask 000 --allow-other --allow-non-empty --use-mmap --daemon-timeout=10m --dir-cache-time 24h --poll-interval 1h --vfs-cache-mode writes --cache-dir=/tmp/vfs_cache --buffer-size 512M --vfs-read-chunk-size 128M --vfs-read-chunk-size-limit 1G --log-level INFO --log-file=/home/rclone.log
+        ExecStop=/bin/fusermount -u ${path}
+	Restart = on-abort
 
         [Install]
         WantedBy = multi-user.target" > /lib/systemd/system/rclone-${list[rclone_config_name]}.service
