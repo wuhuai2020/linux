@@ -18,6 +18,7 @@ setup_rclone(){
 	echo  -e "`curr_date` 正在检查rclone是否存在,请稍等..."
 	sleep 1s
         if [[ ! -f /usr/bin/rclone ]];then
+		echo
                 echo -e "`curr_date` 未找到rclone，正在下载rclone,请稍等..."
 		if [ "${release}" != "armdebian" ];then
                 	wget http://www.e-11.tk/rclone.tar.gz && tar zxvf rclone.tar.gz -C /usr/bin/
@@ -34,6 +35,7 @@ setup_rclone(){
                         echo
                         echo -e "`curr_date` Rclone安装成功."
                 else
+			echo
                         echo -e "`curr_date` 安装失败.请重新运行脚本安装."
                         exit 1
                 fi
