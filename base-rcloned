@@ -15,7 +15,7 @@ red(){
 }
 mount(){
 	fusermount -qzu "${path}" > /dev/null 2>&1
-	rclone mount "${remote}": "${path}" --transfers 10  --buffer-size 1G --vfs-read-chunk-size 256M --vfs-read-chunk-size-limit 2G  --allow-non-empty --allow-other --dir-cache-time 12h --umask 000 >/dev/null 2>&1 & 
+	rclone mount "${remote}": "${path}" --config "/root/.config/rclone/rclone.conf" --transfers 10  --buffer-size 1G --vfs-read-chunk-size 256M --vfs-read-chunk-size-limit 2G  --allow-non-empty --allow-other --dir-cache-time 12h --umask 000 >/dev/null 2>&1 & 
 	sleep 3s
     	ps -ef | grep -v grep | grep -q "${remote}"
 	if [ "$?" -eq "0" ];then
