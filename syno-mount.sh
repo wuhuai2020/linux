@@ -151,7 +151,13 @@ start(){
 		echo
 		echo -e "`red 已添加开机启动.`"
 		echo
-		echo -e "已创建服务，您可以通过 `red ${list[rclone_config_index]}-rcloned\ start\|stop\|restart\|status\|remove` 来管理挂载服务。"
+		echo -e "已创建服务，您可以通过如下命令来管理您的挂载服务。"
+		echo
+		echo -e "`red ${list[rclone_config_index]}-rcloned\ start`     启动服务"
+		echo -e "`red ${list[rclone_config_index]}-rcloned\ stop`      停止服务"
+		echo -e "`red ${list[rclone_config_index]}-rcloned\ restart`   重启服务"
+		echo -e "`red ${list[rclone_config_index]}-rcloned\ status`    查看状态"
+		echo -e "`red ${list[rclone_config_index]}-rcloned\ remove`    删除服务"
 	else
 		echo -e "`red /usr/bin/${list[rclone_config_index]}-rcloned`已经存在，可以使用${list[rclone_config_index]}-rcloned start直接启用。"
 		echo
