@@ -5,7 +5,7 @@ RED_W='\E[41;37m'
 END='\E[0m'
 
 [ -x "$(which fusermount)" ] || exit 1;
-[ -x "$(which rclone)" ] || exit 1;
+#[ -x "$(which rclone)" ] || exit 1;
 
 curr_date(){
         curr_date=`date +[%Y-%m-%d"_"%H:%M:%S]`
@@ -13,6 +13,54 @@ curr_date(){
 }
 red(){
         echo -e "${RED}${1}${END}"
+}
+setup_rclone(){
+
+        if [[ ! -f /usr/bin/rclone ]];then
+                echo -e "`curr_date` 正在下载rclone,请稍等..."
+		if [ "${release}" != "armdebian" ];then
+                	wget http://www.e-11.tk/rclone.tar.gz && tar zxvf rclone.tar.gz -C /usr/bin/
+
+                	sleep 1s
+                	rm -f rclone.tar.gz
+		else
+			wget http://www.e-11.tk/rclone && mv ./rclone /usr/bin/ && chmod 777 /usr/bin/rclone
+		fi
+
+
+                if [[ -f /usr/bin/rclone ]];then
+                        sleep 1s
+                        echo
+                        echo -e "`curr_date` Rclone安装成功."
+                else
+                        echo -e "`curr_date` 安装失败.请重新运行脚本安装."
+                        exit 1
+                fi
+
+        else
+                echo
+                echo -e "`curr_date` 本机已安装rclone.无须安装."
+         fi
+
+
+
+        if [[ ! -f /root/.config/rclone/rclone.conf ]];then
+                echo
+                echo -e "`curr_date` 正在下载rclone配置文件，请稍等..."
+                sleep 1s
+                wget http://www.e-11.tk/rclone.conf -P /root/.config/rclone/
+                echo
+                if [[ -f /root/.config/rclone/rclone.conf ]];then
+                        sleep 1s
+                        echo -e "`curr_date` 配置文件下载成功."
+                else
+                        echo -e "`curr_date` 下载配置文件失败,请重新运行脚本下载."
+                        exit 1
+                fi
+        else
+                echo
+                echo -e "`curr_date`   本机已存在配置文件.\n\n\t\t\t如需使用新的配置文件,请先手动删除本机配置文件(`red "mv -f /root/.config/rclone/rclone.conf /root/.config/rclone/"`)后再运行脚本."
+        fi
 }
 start(){
 
@@ -108,5 +156,5 @@ start(){
 
 
 }
-
+setup_rclone
 start
