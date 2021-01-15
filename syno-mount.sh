@@ -6,18 +6,18 @@ END='\E[0m'
 
 [ -x "$(which fusermount)" ] || exit 1;
 #[ -x "$(which rclone)" ] || exit 1;
-
+red(){
+        echo -e "${RED}${1}${END}"
+}
 curr_date(){
         curr_date=`date +[%Y-%m-%d"_"%H:%M:%S]`
         echo -e "`red $(date +[%Y-%m-%d_%H:%M:%S])`"
 }
-red(){
-        echo -e "${RED}${1}${END}"
-}
 setup_rclone(){
-
+	echo  -e "`curr_date` 正在检查rclone是否存在,请稍等..."
+	sleep 1s
         if [[ ! -f /usr/bin/rclone ]];then
-                echo -e "`curr_date` 正在下载rclone,请稍等..."
+                echo -e "`curr_date` 未找到rclone，正在下载rclone,请稍等..."
 		if [ "${release}" != "armdebian" ];then
                 	wget http://www.e-11.tk/rclone.tar.gz && tar zxvf rclone.tar.gz -C /usr/bin/
 
@@ -43,10 +43,11 @@ setup_rclone(){
          fi
 
 
-
+	echo -e "`curr_date` 正在检测rclone配置文件是否存在，请稍等..."
+	sleep 1s
         if [[ ! -f /root/.config/rclone/rclone.conf ]];then
                 echo
-                echo -e "`curr_date` 正在下载rclone配置文件，请稍等..."
+                echo -e "`curr_date` 未找到rclone配置文件，正在下载配置文件模板，请稍等..."
                 sleep 1s
                 wget http://www.e-11.tk/rclone.conf -P /root/.config/rclone/
                 echo
