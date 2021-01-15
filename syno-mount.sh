@@ -59,7 +59,7 @@ setup_rclone(){
                 fi
         else
                 echo
-                echo -e "`curr_date`   本机已存在配置文件.\n\n\t\t\t如需使用新的配置文件,请先手动删除本机配置文件(`red "mv -f /root/.config/rclone/rclone.conf /root/.config/rclone/"`)后再运行脚本."
+                echo -e "`curr_date`   本机已存在配置文件.\n\n如需使用新的配置文件,请先手动删除本机配置文件(`red "mv -f /root/.config/rclone/rclone.conf /root/.config/rclone/"`)后再运行脚本."
         fi
 }
 start(){
