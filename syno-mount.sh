@@ -14,6 +14,7 @@ curr_date(){
         echo -e "`red $(date +[%Y-%m-%d_%H:%M:%S])`"
 }
 setup_rclone(){
+	echo
 	echo  -e "`curr_date` 正在检查rclone是否存在,请稍等..."
 	sleep 1s
         if [[ ! -f /usr/bin/rclone ]];then
@@ -42,7 +43,7 @@ setup_rclone(){
                 echo -e "`curr_date` 本机已安装rclone.无须安装."
          fi
 
-
+	echo
 	echo -e "`curr_date` 正在检测rclone配置文件是否存在，请稍等..."
 	sleep 1s
         if [[ ! -f /root/.config/rclone/rclone.conf ]];then
