@@ -82,7 +82,7 @@ start(){
 					echo
 					echo -e "   本地已配置网盘列表:"
 					echo
-			echo -e "      `red +-------------------------+`"
+			echo -e "      `red +--------------------------+`"
 					for((j=1;j<=${#list[@]};j++))
 					do
 			temp="${j}：${list[j]}"
@@ -95,7 +95,7 @@ start(){
 				temp="${temp}\t"
 			fi
 							echo -e "      ${RED}| ${temp}|${END}"
-							echo -e "      `red +-------------------------+`"
+							echo -e "      `red +--------------------------+`"
 					done
 
 
