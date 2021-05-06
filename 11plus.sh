@@ -169,8 +169,9 @@ setup_rclone(){
 
 setup_emby(){
 
-        emby_version=`curl -s https://github.com/MediaBrowser/Emby.Releases/releases/ | grep -Eo "tag/[0-9.]+\">([0-9.]+.*)" | grep -v "beta"|grep -Eo "[0-9.]+"|head -n1`
-        centos_packet_file="emby-server-rpm_${emby_version}_x86_64.rpm"
+        #emby_version=`curl -s https://github.com/MediaBrowser/Emby.Releases/releases/ | grep -Eo "tag/[0-9.]+\">([0-9.]+.*)" | grep -v "beta"|grep -Eo "[0-9.]+"|head -n1`
+        emby_version='4.5.4.0'
+	centos_packet_file="emby-server-rpm_${emby_version}_x86_64.rpm"
         debian_packet_file="emby-server-deb_${emby_version}_amd64.deb"
 	armdebian64_packet_file="emby-server-deb_${emby_version}_arm64.deb"
         url="https://github.com/MediaBrowser/Emby.Releases/releases/download"
